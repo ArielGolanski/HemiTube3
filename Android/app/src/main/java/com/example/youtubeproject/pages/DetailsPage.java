@@ -111,9 +111,8 @@ public class DetailsPage extends AppCompatActivity {
         deleteButton.setOnClickListener(view -> {
             String username = sessionManager.getLoggedUser().getUsername();
             String token = sessionManager.getToken();
-            CompletableFuture<Boolean> deleteFuture = userViewModel.deleteUser(username, token);
 
-            deleteFuture.thenAccept(success -> runOnUiThread(() -> {
+            userViewModel.deleteUser(username, token).observe(this, success -> {
                 if (success) {
                     Log.d(TAG, "USER DELETED");
                     Toast.makeText(this, "User deleted", Toast.LENGTH_SHORT).show();
@@ -127,7 +126,17 @@ public class DetailsPage extends AppCompatActivity {
                 } else {
                     Toast.makeText(this, "Failed to delete user", Toast.LENGTH_SHORT).show();
                 }
-            }));
+            });
+        });
+
+// Observe for user updates
+        userViewModel.getUserLiveData().observe(this, user -> {
+            if (user != null) {
+                sessionManager.setLoggedUser(user);
+                Toast.makeText(this, "User updated successfully", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "User update failed", Toast.LENGTH_SHORT).show();
+            }
         });
 
         userViewModel.getUserLiveData().observe(this, user -> {

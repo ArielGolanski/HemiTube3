@@ -154,21 +154,24 @@ public class UsersRepository {
 
 
 
-    public CompletableFuture<Boolean> deleteUser(String username, String token) {
-        CompletableFuture<Boolean> future = new CompletableFuture<>();
+    public LiveData<Boolean> deleteUser(String username, String token) {
+        MutableLiveData<Boolean> deletionStatus = new MutableLiveData<>();
+
         apiService.deleteUser(username, "Bearer " + token).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                future.complete(response.isSuccessful());
+                deletionStatus.setValue(response.isSuccessful());
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                future.completeExceptionally(t);
+                deletionStatus.setValue(false); // Set deletion status as false on failure
             }
         });
-        return future;
+
+        return deletionStatus;
     }
+
 
 
 }

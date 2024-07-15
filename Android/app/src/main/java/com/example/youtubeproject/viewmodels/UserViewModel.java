@@ -38,7 +38,7 @@ public class UserViewModel extends ViewModel {
         return userLiveData;
     }
 
-    public CompletableFuture<Boolean> deleteUser(String username, String token) {
+    public LiveData<Boolean> deleteUser(String username, String token) {
         return userRepository.deleteUser(username, token);
     }
 
